@@ -1,6 +1,6 @@
 import React from 'react';
 import { Header, Content, Button ,
-  Left, Body, Right, Icon, Title } from 'native-base';
+  Left, Body, Right, Icon, Title, Picker } from 'native-base';
 import { Actions } from 'react-native-router-flux';
 
 const AppHeader = ({ title, showBackButton=true }) => {

@@ -23,7 +23,7 @@ class ReportPage extends Component {
     showCamera: false,
     imageURI: '',
     rotatedImageURI: '',
-    results: [{ plate: 'PLATE1' }, { plate: 'PLATE2' }]
+    results: []
   };
 
   componentDidMount() {
@@ -262,7 +262,6 @@ class ReportPage extends Component {
   render() {
     return (
       <Container>
-        <AppHeader title='Report'/>
         <Content>
           {this.renderCTA()}
           {this.renderCamera()}

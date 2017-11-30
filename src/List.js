@@ -20,7 +20,6 @@ class ListPage extends Component {
   render() {
     return (
       <Container>
-        <AppHeader title='Offenders' showBackButton={false} />
         <Content>
           <Card>
             <CardItem header>
