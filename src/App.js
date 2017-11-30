@@ -4,21 +4,40 @@ import { View, Dimensions, Image } from 'react-native';
 import { Col, Row, Grid } from 'react-native-easy-grid';
 import { Container, Header, Content, Button, Text ,
   Left, Body, Right, Icon, Title, Subtitle, List, ListItem,
-  Card, CardItem } from 'native-base';
+  Card, CardItem, Spinner } from 'native-base';
 import ImageResizer from 'react-native-image-resizer';
 import Camera from 'react-native-camera';
 import RNFS from 'react-native-fs';
+import helpers from './helpers';
+import CurrentLocation from './components/CurrentLocation';
 
 const ACCESS_TOKEN = "9gMbELAXLHLTE5mghQxHw9KqsNeEvsQmzTNmzFE7DcdELCNEuYuUpyMp4AnhcVr2";
 
 class App extends Component {
+
   state = {
+    error: null,
+    latitude: null,
+    longitude: null,
     header: 'App',
     showCamera: false,
     imageURI: '',
     rotatedImageURI: '',
-    results: []
+    results: [{ plate: 'PLATE1' }, { plate: 'PLATE2' }]
   };
+
+  componentDidMount() {
+    navigator.geolocation.getCurrentPosition((position) => {
+        this.setState({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          error: null,
+        });
+      },
+      (error) => this.setState({ error: error.message }),
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
+    );
+  }
 
   onButtonPress() {
     this.setState( { showCamera: true });
@@ -40,23 +59,22 @@ class App extends Component {
     axios.post(url, data, config)
       .then(results =>  {
         this.setState({
-          results: this.processResults(results.data.data.results)
+          results: helpers.processALPRResults(results.data.data.results)
         });
       })
       .catch(err => console.log('error', err));
   }
 
-  processResults(results) {
-    if (results.length > 0) {
-      results = results.map(result => {
-        return {
-          confidence: result.confidence,
-          plate: result.plate
-        }
+  onConfirmLicensePlate(plate) {
+    this.setState({
+      confirmLicenseLoading: plate
+    });
+    console.log('Calling API with plate ', plate, ' and coordinates lat ', this.state.latitude, ' long ', this.state.longitude);
+    setTimeout(() => {
+      this.setState({
+        confirmLicenseLoading: false
       });
-    }
-    console.log('results', results);
-    return results;
+    }, 2000);
   }
 
   renderResults() {
@@ -65,7 +83,7 @@ class App extends Component {
 
         <Card>
           <CardItem header>
-            <Text>Results</Text>
+            <Text>We've identified the following license plate(s):</Text>
           </CardItem>
 
           <List>
@@ -75,20 +93,31 @@ class App extends Component {
                   <CardItem>
                     <Body>
                       <Text>{result.plate}</Text>
+                      <Button primary
+                              title="Confirm"
+                              style={{ marginTop: 10 }}
+                              onPress={() => this.onConfirmLicensePlate(result.plate)}
+                      >
+                        <Text>Confirm</Text>
+                        { this.state.confirmLicenseLoading === result.plate
+                          ? <Spinner />
+                          : null }
+                      </Button>
                     </Body>
                   </CardItem>
                 </ListItem>
               );
             })}
+
           </List>
+
+          <CardItem>
+            <CurrentLocation/>
+          </CardItem>
         </Card>
       );
     }
   }
-
-
-
-
 
   rotateImage(path) {
     return new Promise((resolve, reject) => {
@@ -180,8 +209,16 @@ class App extends Component {
   renderImage() {
     if (this.state.imageURI.length > 0) {
       return (
-        <Image source={{uri: this.state.imageURI, isStatic:true}}
-        style={{height: 200, width: null, flex: 1}}/>
+        <Card>
+          <CardItem header>
+            <Text>Image</Text>
+          </CardItem>
+
+          <CardItem cardBody>
+            <Image source={{uri: this.state.imageURI, isStatic:true}}
+            style={{height: 200, width: null, flex: 1}}/>
+          </CardItem>
+        </Card>
       );
     }
   }
@@ -215,15 +252,7 @@ class App extends Component {
             </CardItem>
           </Card>
 
-          <Card>
-            <CardItem header>
-              <Text>Image</Text>
-            </CardItem>
-
-            <CardItem cardBody>
-              {this.renderImage()}
-            </CardItem>
-          </Card>
+          {this.renderImage()}
 
         </Content>
       );
