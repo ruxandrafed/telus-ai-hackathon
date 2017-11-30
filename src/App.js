@@ -1,16 +1,23 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { View, Button, Dimensions, Text, Image } from 'react-native';
+import { View, Dimensions, Image } from 'react-native';
+import { Col, Row, Grid } from 'react-native-easy-grid';
+import { Container, Header, Content, Button, Text ,
+  Left, Body, Right, Icon, Title, Subtitle, List, ListItem,
+  Card, CardItem } from 'native-base';
+import ImageResizer from 'react-native-image-resizer';
 import Camera from 'react-native-camera';
 import RNFS from 'react-native-fs';
-import { Header } from './components/common';
 
 const ACCESS_TOKEN = "9gMbELAXLHLTE5mghQxHw9KqsNeEvsQmzTNmzFE7DcdELCNEuYuUpyMp4AnhcVr2";
 
 class App extends Component {
   state = {
+    header: 'App',
     showCamera: false,
-    imageURI: ''
+    imageURI: '',
+    rotatedImageURI: '',
+    results: []
   };
 
   onButtonPress() {
@@ -30,19 +37,87 @@ class App extends Component {
         'Content-Type': 'application/json'
       }
     };
-    console.log('POTATO', base64String);
-//    axios.post(url, data, config)
-//      .then(results =>  {
-//        console.log('results', results);
-//
-//      })
-//      .catch(err => console.log('error', err));
+    axios.post(url, data, config)
+      .then(results =>  {
+        this.setState({
+          results: this.processResults(results.data.data.results)
+        });
+      })
+      .catch(err => console.log('error', err));
+  }
+
+  processResults(results) {
+    if (results.length > 0) {
+      results = results.map(result => {
+        return {
+          confidence: result.confidence,
+          plate: result.plate
+        }
+      });
+    }
+    console.log('results', results);
+    return results;
+  }
+
+  renderResults() {
+    if (this.state.results.length > 0) {
+      return (
+
+        <Card>
+          <CardItem header>
+            <Text>Results</Text>
+          </CardItem>
+
+          <List>
+            {this.state.results.map(result => {
+              return (
+                <ListItem key={result.plate}>
+                  <CardItem>
+                    <Body>
+                      <Text>{result.plate}</Text>
+                    </Body>
+                  </CardItem>
+                </ListItem>
+              );
+            })}
+          </List>
+        </Card>
+      );
+    }
+  }
+
+
+
+
+
+  rotateImage(path) {
+    return new Promise((resolve, reject) => {
+      Image.getSize(path, (width, height) => {
+        if (width < height) {
+          ImageResizer.createResizedImage(path, width, height, 'JPEG', 80, 90).then((response) => {
+            const newPath = response.path;
+            this.setState({
+              rotatedImageURI: response.uri
+            });
+            resolve(newPath);
+          }).catch((err) => {
+            reject(err);
+          });
+        } else {
+          resolve(path);
+        }
+      });
+    });
   }
 
   convertToBase64(path) {
-    RNFS.readFile(path, 'base64')
-      .then(base64Str => {
-        this.extractLicensePlate(base64Str);
+    this.rotateImage(path)
+      .then(newPath => {
+//        console.log('convertToBase64', newPath);
+        RNFS.readFile(newPath, 'base64')
+          .then(base64Str => {
+            this.extractLicensePlate(base64Str);
+          });
       });
   }
 
@@ -70,16 +145,34 @@ class App extends Component {
   renderCamera() {
     if (this.state.showCamera) {
       return (
-        <Camera
-          ref={(cam) => {
-            this.camera = cam;
-          }}
-          style={styles.preview}
-          captureTarget={Camera.constants.CaptureTarget.disk}
-          aspect={Camera.constants.Aspect.fill}>
-          <Text style={styles.capture} onPress={this.takePicture.bind(this)}>[CAPTURE]</Text>
-          <Text style={styles.closeCamera} onPress={this.closeCamera.bind(this)}>[CANCEL]</Text>
-        </Camera>
+        <Container>
+          <Content>
+            <Grid>
+              <Row style={{ backgroundColor: '#635DB7', height: 300 }}>
+                <Camera
+                  ref={(cam) => {
+                    this.camera = cam;
+                  }}
+                  style={styles.preview}
+                  captureTarget={Camera.constants.CaptureTarget.disk}
+                  aspect={Camera.constants.Aspect.fill}>
+                </Camera>
+              </Row>
+              <Row style={{ backgroundColor: '#eee', height: 30 }}>
+                <View style={{ flexDirection: "row", flex: 1, position: "absolute", bottom: 50, left: 0, right: 0, justifyContent: 'space-between', padding: 15 }}>
+                  <Button bordered success onPress={() => this.takePicture()}>
+                    <Icon name="ios-camera" />
+                    <Text>Capture</Text>
+                  </Button>
+                  <Button bordered warning onPress={() => this.closeCamera()}>
+                    <Icon name="ios-close-circle-outline" />
+                    <Text>Cancel</Text>
+                  </Button>
+                </View>
+              </Row>
+            </Grid>
+          </Content>
+        </Container>
       );
     }
   }
@@ -87,10 +180,8 @@ class App extends Component {
   renderImage() {
     if (this.state.imageURI.length > 0) {
       return (
-        <Image
-          source={{uri: this.state.imageURI, isStatic:true}}
-          style={styles.imageStyle}
-        />
+        <Image source={{uri: this.state.imageURI, isStatic:true}}
+        style={{height: 200, width: null, flex: 1}}/>
       );
     }
   }
@@ -98,26 +189,78 @@ class App extends Component {
   renderCTA() {
     if (!this.state.showCamera) {
       return  (
-        <View>
-          <Button
-            title="Open camera"
-            onPress={this.onButtonPress.bind(this)}
-          >
-            Open camera
-          </Button>
-          {this.renderImage()}
-        </View>
+        <Content>
+          <Card>
+            <CardItem header>
+              <Text>Parked in a bike lane?</Text>
+            </CardItem>
+
+            <CardItem>
+              <Body>
+                <Text>
+                  Become a bike lance enforcer! Help us by snapping a picture of vehicles parked in bike lanes.
+                </Text>
+                <Button primary
+                        title="Open camera"
+                        style={{ marginTop: 10 }}
+                        onPress={this.onButtonPress.bind(this)}
+                >
+                  <Text>Open camera</Text>
+                </Button>
+              </Body>
+            </CardItem>
+
+            <CardItem footer>
+              <Text>Thank you!</Text>
+            </CardItem>
+          </Card>
+
+          <Card>
+            <CardItem header>
+              <Text>Image</Text>
+            </CardItem>
+
+            <CardItem cardBody>
+              {this.renderImage()}
+            </CardItem>
+          </Card>
+
+        </Content>
       );
     }
   }
 
+  renderHeader(subtitle) {
+    return (
+      <Header>
+        <Left>
+          <Button transparent>
+            <Icon name='arrow-back' />
+          </Button>
+        </Left>
+        <Body>
+          <Title>Bike Lanes</Title>
+          <Subtitle>{subtitle}</Subtitle>
+        </Body>
+        <Right>
+          <Button transparent>
+            <Icon name='menu' />
+          </Button>
+        </Right>
+      </Header>
+    );
+  }
+
   render() {
     return (
-      <View style={styles.appContainerStyle}>
-        <Header headerText="Bike Parking Patrol" />
-        {this.renderCTA()}
-        {this.renderCamera()}
-      </View>
+      <Container>
+        {this.renderHeader(this.state.header)}
+        <Content>
+          {this.renderCTA()}
+          {this.renderCamera()}
+          {this.renderResults()}
+        </Content>
+      </Container>
     );
   }
 }
@@ -154,8 +297,12 @@ const styles = {
     margin: 5
   },
   imageStyle: {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
+    width: Dimensions.get('window').width/2,
+    height: Dimensions.get('window').height/2,
+  },
+  imageRotatedStyle: {
+    height: Dimensions.get('window').width/2,
+    width: Dimensions.get('window').height/2,
   }
 };
 
