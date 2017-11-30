@@ -38,6 +38,22 @@ const INCIDENTS = [
     "licencePlate": "B6M WM2",
     "confidence": 30,
     "timestamp": 1412923067736
+  },
+  {
+    "id": 5,
+    "latitude": 49.287,
+    "longitude": -123.102,
+    "licencePlate": "A6M WM2",
+    "confidence": 30,
+    "timestamp": 1412923067736
+  },
+  {
+    "id": 6,
+    "latitude": 49.265,
+    "longitude": -123.112,
+    "licencePlate": "C6M WM2",
+    "confidence": 30,
+    "timestamp": 1412923067736
   }
 ];
 
@@ -63,7 +79,13 @@ const getIncidents = () => {
   return promise;
 }
 
+const formatDate = (timestamp) => {
+  const date = new Date(timestamp);
+  return date.toLocaleDateString();
+}
+
 export default {
   processALPRResults,
-  getIncidents
+  getIncidents,
+  formatDate
 }

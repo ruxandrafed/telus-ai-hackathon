@@ -17,11 +17,6 @@ class ListPage extends Component {
     })
   }
 
-  formatDate(timestamp) {
-   const date = new Date(timestamp);
-   return date.toLocaleDateString();
-  }
-
   render() {
     return (
       <Container>
@@ -53,7 +48,7 @@ class ListPage extends Component {
                                 </Body>
                               </CardItem>
                               <CardItem footer>
-                                <Text>Date: {this.formatDate(incident.timestamp)}</Text>
+                                <Text>Date: {helpers.formatDate(incident.timestamp)}</Text>
                               </CardItem>
                             </Card>
                           </ListItem>

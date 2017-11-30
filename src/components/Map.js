@@ -4,8 +4,8 @@ import {
   View,
   Dimensions,
 } from 'react-native';
-
 import MapView from 'react-native-maps';
+import helpers from '../helpers';
 
 const { width, height } = Dimensions.get('window');
 
@@ -15,49 +15,47 @@ const LONGITUDE = -123.1207;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-class Map extends React.Component {
+class Callouts extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      region: {
+        latitude: LATITUDE,
+        longitude: LONGITUDE,
+        latitudeDelta: LATITUDE_DELTA,
+        longitudeDelta: LONGITUDE_DELTA,
+      },
+      markers: props.incidents.map(incident => {
+        return {
+          coordinate: {
+            latitude: incident.latitude,
+            longitude: incident.longitude,
+          },
+          licencePlate: incident.licencePlate,
+          confidence: incident.confidence,
+          timestamp: incident.timestamp
+        }
+      }),
+    };
   }
 
-//  focusMap(markers, animated) {
-//    console.log(`Markers received to populate map: ${markers}`);
-//    this.map.fitToSuppliedMarkers(markers, animated);
-//  }
-//
-//  focus1() {
-//    animationTimeout = setTimeout(() => {
-//      this.focusMap([
-//        markerIDs[1],
-//        markerIDs[4],
-//      ], true);
-//
-//      this.focus2();
-//    }, timeout);
-//  }
-
   render() {
+    const { region, markers } = this.state;
     return (
       <View style={styles.container}>
         <MapView
           provider={this.props.provider}
-          ref={ref => { this.map = ref; }}
           style={styles.map}
-          initialRegion={{
-            latitude: LATITUDE,
-            longitude: LONGITUDE,
-            latitudeDelta: LATITUDE_DELTA,
-            longitudeDelta: LONGITUDE_DELTA,
-          }}
+          initialRegion={region}
         >
-          {this.props.incidents.map(incident => {
+          {markers.map(marker => {
             return (
               <MapView.Marker
-                key={incident.id}
-                identifier={incident.licencePlate}
-                coordinate={incident}
+                key={marker.id}
+                coordinate={marker.coordinate}
+                title={marker.licencePlate}
+                description={`Confidence: ${marker.confidence}%. Submitted on: ${helpers.formatDate(marker.timestamp)}`}
               />
             );
           })}
@@ -67,11 +65,14 @@ class Map extends React.Component {
   }
 }
 
-Map.propTypes = {
-  provider: MapView.ProviderPropType,
-};
-
 const styles = StyleSheet.create({
+  customView: {
+    width: 140,
+    height: 100,
+  },
+  plainView: {
+    width: 60,
+  },
   container: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'flex-end',
@@ -80,6 +81,28 @@ const styles = StyleSheet.create({
   map: {
     ...StyleSheet.absoluteFillObject,
   },
+  bubble: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 20,
+  },
+  latlng: {
+    width: 200,
+    alignItems: 'stretch',
+  },
+  button: {
+    width: 80,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    marginHorizontal: 10,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    marginVertical: 20,
+    backgroundColor: 'transparent',
+  },
 });
 
-export default Map;
+export default Callouts;
