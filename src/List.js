@@ -37,17 +37,16 @@ class ListPage extends Component {
                           <ListItem key={incident.id}>
                             <Card key={incident.id}>
                               <CardItem header>
-                                <Text>Offender: {incident.licencePlate}</Text>
+                                <Text>{incident.licencePlate}</Text>
                               </CardItem>
                               <CardItem>
                                 <Body>
-                                <Text>
-                                  Confidence Score: {incident.confidence}
-                                </Text>
+                                  <Text
+                                    style={ { color: helpers.getColor(incident.confidence) } }>
+                                    {incident.confidence}% confidence
+                                  </Text>
+                                  <Text>Date: {helpers.formatDate(incident.timestamp)}</Text>
                                 </Body>
-                              </CardItem>
-                              <CardItem footer>
-                                <Text>Date: {helpers.formatDate(incident.timestamp)}</Text>
                               </CardItem>
                             </Card>
                           </ListItem>

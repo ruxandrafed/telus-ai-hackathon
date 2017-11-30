@@ -20,7 +20,7 @@ const INCIDENTS = [
     "latitude": 49.285,
     "longitude": -123.120,
     "licencePlate": "G5D M2D",
-    "confidence": 50,
+    "confidence": 65,
     "timestamp": 1412923067736
   },
   {
@@ -36,7 +36,7 @@ const INCIDENTS = [
     "latitude": 49.283,
     "longitude": -123.112,
     "licencePlate": "B6M WM2",
-    "confidence": 30,
+    "confidence": 78,
     "timestamp": 1412923067736
   },
   {
@@ -52,7 +52,7 @@ const INCIDENTS = [
     "latitude": 49.265,
     "longitude": -123.112,
     "licencePlate": "C6M WM2",
-    "confidence": 30,
+    "confidence": 99,
     "timestamp": 1412923067736
   }
 ];
@@ -84,8 +84,19 @@ const formatDate = (timestamp) => {
   return date.toLocaleDateString();
 }
 
+const getColor = (confidenceScore) => {
+  if (confidenceScore > 80) {
+    return 'green';
+  } else if (confidenceScore > 60) {
+    return 'orange';
+  } else {
+    return 'red';
+  }
+}
+
 export default {
   processALPRResults,
   getIncidents,
-  formatDate
+  formatDate,
+  getColor
 }

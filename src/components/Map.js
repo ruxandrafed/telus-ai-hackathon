@@ -55,7 +55,8 @@ class Callouts extends React.Component {
                 key={marker.id}
                 coordinate={marker.coordinate}
                 title={marker.licencePlate}
-                description={`Confidence: ${marker.confidence}%. Submitted on: ${helpers.formatDate(marker.timestamp)}`}
+                pinColor={helpers.getColor(marker.confidence)}
+                description={`${marker.confidence}% confidence. Submitted on: ${helpers.formatDate(marker.timestamp)}`}
               />
             );
           })}
