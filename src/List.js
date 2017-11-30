@@ -39,7 +39,6 @@ class ListPage extends Component {
                   <Body>
                     <List>
                       {this.state.incidents.map(incident => {
-                        console.log('INCIDENT', incident);
                         return (
                           <ListItem key={incident.id}>
                             <Card key={incident.id}>
@@ -67,9 +66,9 @@ class ListPage extends Component {
 
             <CardItem footer>
               <Button transparent
-                      onPress={() => Actions.report()}
+                      onPress={() => Actions.map({incidents: this.state.incidents })}
               >
-                <Text>Report</Text>
+                <Text>See map</Text>
               </Button>
             </CardItem>
           </Card>

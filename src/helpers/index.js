@@ -9,24 +9,39 @@ const INCIDENTS = [
   },
   {
     "id": 1,
-    "latitude": 49.35,
-    "longitude": -123.87,
+    "latitude": 49.29,
+    "longitude": -123.134,
     "licencePlate": "WM4 5M6",
     "confidence": 90,
     "timestamp": 1412023569936
   },
   {
     "id": 2,
-    "latitude": 49.023,
-    "longitude": -129.99,
-    "licencePlate": "A5D M2D",
+    "latitude": 49.285,
+    "longitude": -123.120,
+    "licencePlate": "G5D M2D",
     "confidence": 50,
+    "timestamp": 1412923067736
+  },
+  {
+    "id": 3,
+    "latitude": 49.284,
+    "longitude": -123.133,
+    "licencePlate": "A5D WM2",
+    "confidence": 30,
+    "timestamp": 1412923067736
+  },
+  {
+    "id": 4,
+    "latitude": 49.283,
+    "longitude": -123.112,
+    "licencePlate": "B6M WM2",
+    "confidence": 30,
     "timestamp": 1412923067736
   }
 ];
 
 const processALPRResults = (results) => {
-  console.log('processing results');
   if (results.length > 0) {
     results = results.map(result => {
       return {
