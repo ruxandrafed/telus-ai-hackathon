@@ -5,7 +5,7 @@ import {
   Dimensions,
 } from 'react-native';
 import MapView from 'react-native-maps';
-import helpers from '../helpers';
+import helpers from '../helpers/index';
 
 const { width, height } = Dimensions.get('window');
 
@@ -48,11 +48,12 @@ class Callouts extends React.Component {
           provider={this.props.provider}
           style={styles.map}
           initialRegion={region}
+          showsUserLocation={true}
         >
           {markers.map(marker => {
             return (
               <MapView.Marker
-                key={marker.id}
+                key={marker.licencePlate}
                 coordinate={marker.coordinate}
                 title={marker.licencePlate}
                 pinColor={helpers.getColor(marker.confidence)}

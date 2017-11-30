@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { View, Dimensions, Image } from 'react-native';
-import { Col, Row, Grid } from 'react-native-easy-grid';
+import { Row, Grid } from 'react-native-easy-grid';
 import { Container, Header, Content, Button, Text ,
   Left, Body, Right, Icon, Title, Subtitle, List, ListItem,
   Card, CardItem, Spinner } from 'native-base';
@@ -10,7 +10,6 @@ import Camera from 'react-native-camera';
 import RNFS from 'react-native-fs';
 import helpers from './helpers';
 import CurrentLocation from './components/CurrentLocation';
-import AppHeader from './components/AppHeader';
 
 const ACCESS_TOKEN = "9gMbELAXLHLTE5mghQxHw9KqsNeEvsQmzTNmzFE7DcdELCNEuYuUpyMp4AnhcVr2";
 
@@ -78,6 +77,7 @@ class ReportPage extends Component {
   }
 
   renderResults() {
+    console.log(this.state.results);
     if (this.state.results.length > 0) {
       return (
 

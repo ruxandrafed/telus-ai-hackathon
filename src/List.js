@@ -3,7 +3,6 @@ import { Actions } from 'react-native-router-flux';
 import { Container, Header, Content, Button, Text ,
   Left, Body, Right, Icon, Title, Subtitle, List, ListItem,
   Card, CardItem, Spinner, Item } from 'native-base';
-import AppHeader from './components/AppHeader';
 import helpers from './helpers';
 
 class ListPage extends Component {
