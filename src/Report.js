@@ -10,16 +10,16 @@ import Camera from 'react-native-camera';
 import RNFS from 'react-native-fs';
 import helpers from './helpers';
 import CurrentLocation from './components/CurrentLocation';
+import AppHeader from './components/AppHeader';
 
 const ACCESS_TOKEN = "9gMbELAXLHLTE5mghQxHw9KqsNeEvsQmzTNmzFE7DcdELCNEuYuUpyMp4AnhcVr2";
 
-class App extends Component {
+class ReportPage extends Component {
 
   state = {
     error: null,
     latitude: null,
     longitude: null,
-    header: 'App',
     showCamera: false,
     imageURI: '',
     rotatedImageURI: '',
@@ -259,31 +259,10 @@ class App extends Component {
     }
   }
 
-  renderHeader(subtitle) {
-    return (
-      <Header>
-        <Left>
-          <Button transparent>
-            <Icon name='arrow-back' />
-          </Button>
-        </Left>
-        <Body>
-          <Title>Bike Lanes</Title>
-          <Subtitle>{subtitle}</Subtitle>
-        </Body>
-        <Right>
-          <Button transparent>
-            <Icon name='menu' />
-          </Button>
-        </Right>
-      </Header>
-    );
-  }
-
   render() {
     return (
       <Container>
-        {this.renderHeader(this.state.header)}
+        <AppHeader title='Report'/>
         <Content>
           {this.renderCTA()}
           {this.renderCamera()}
@@ -335,4 +314,4 @@ const styles = {
   }
 };
 
-export default App;
+export default ReportPage;
